@@ -42,5 +42,4 @@ public class UserController {
         List<User> users = userService.searchUser(query);
         return new ResponseEntity<List<User>>(users, HttpStatus.OK);
     }
-
 }
