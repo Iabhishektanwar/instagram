@@ -70,6 +70,7 @@ public class PostController {
         User user = userService.findUserProfile(token);
         Post unLikedPost = postService.unLikePost(postId, user.getId());
         return new ResponseEntity<Post>(unLikedPost, HttpStatus.OK);
+
     }
 
     @DeleteMapping("/delete/{postId}")
