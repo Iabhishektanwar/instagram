@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,28 +22,23 @@ import java.util.List;
 
 public class JwtTokenValidationFilter extends OncePerRequestFilter {
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
         String jwt = request.getHeader(SecurityContext.HEADER);
+
         if(jwt != null) {
             try {
                 jwt = jwt.substring(7);
-
                 SecretKey key = Keys.hmacShaKeyFor(SecurityContext.JWT_KEY.getBytes());
-
                 Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
-
                 String username = String.valueOf(claims.get("username"));
-
                 String authorities = String.valueOf(claims.get("authorities"));
-
                 List<GrantedAuthority> grantedAuthorityList = AuthorityUtils
                         .commaSeparatedStringToAuthorityList(authorities);
-
                 Authentication authentication = new UsernamePasswordAuthenticationToken(username, null,
                         grantedAuthorityList);
-
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (Exception e) {
